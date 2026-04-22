@@ -1,25 +1,32 @@
 #ifndef MONITOR_IOCTL_H
 #define MONITOR_IOCTL_H
 
-#ifdef __KERNEL__
 #include <linux/ioctl.h>
-#include <linux/types.h>
-#else
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#endif
 
-#define MONITOR_NAME_LEN 32
+/* ──────────────────────────────────────────────
+ * monitor_ioctl.h
+ *
+ * GIVEN BY PROFESSOR (shared "language" file)
+ *
+ * This file defines the commands used by engine.c (user space)
+ * to talk to monitor.c (kernel space) via ioctl.
+ *
+ * Think of it as a menu of available kernel commands.
+ * ────────────────────────────────────────────── */
 
-struct monitor_request {
-    pid_t pid;
-    unsigned long soft_limit_bytes;
-    unsigned long hard_limit_bytes;
-    char container_id[MONITOR_NAME_LEN];
+#define MONITOR_MAGIC  'M'   /* Magic number to identify our device */
+
+/* Structure sent from engine.c → kernel to register a container */
+struct container_info {
+    pid_t  pid;              /* Host PID of the container process  */
+    long   soft_limit_kb;   /* Soft memory limit in kilobytes      */
+    long   hard_limit_kb;   /* Hard memory limit in kilobytes      */
+    char   name[64];        /* Container name (e.g. "alpha")       */
 };
 
-#define MONITOR_MAGIC 'M'
-#define MONITOR_REGISTER _IOW(MONITOR_MAGIC, 1, struct monitor_request)
-#define MONITOR_UNREGISTER _IOW(MONITOR_MAGIC, 2, struct monitor_request)
+/* ioctl command numbers */
+#define MONITOR_REGISTER   _IOW(MONITOR_MAGIC, 1, struct container_info)
+#define MONITOR_UNREGISTER _IOW(MONITOR_MAGIC, 2, pid_t)
+#define MONITOR_LIST       _IOR(MONITOR_MAGIC, 3, int)   /* returns count */
 
-#endif
+#endif /* MONITOR_IOCTL_H */
