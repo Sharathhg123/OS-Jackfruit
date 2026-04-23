@@ -14,40 +14,67 @@
 ## 2. Build, Load, and Run Instructions
 
 The following steps reproduce the complete setup on a fresh Ubuntu 22.04/24.04 VM.
+# OS-Jackfruit: Multi-Container Runtime with Kernel Monitoring
+
+---
+
+## 1. Team Information
+
+| Name        | SRN           |
+| ----------- | ------------- |
+| Sharath H G | PES1UG25CS844 |
+| Gowtham S   | PES1UG24CS173 |
+
+---
+
+## 2. Build, Load, and Run Instructions
+
+The following steps reproduce the complete setup on a fresh Ubuntu 22.04/24.04 VM.
 
 ---
 
 ### Step 1: Build the Project
 
+```bash id="u4xq1a"
 make
+```
 
 This compiles:
-- engine (user-space runtime + supervisor)
-- monitor.ko (kernel module)
-- cpu_hog, memory_hog, io_pulse workloads
+
+* engine (user-space runtime + supervisor)
+* monitor.ko (kernel module)
+* cpu_hog, memory_hog, io_pulse workloads
 
 ---
 
 ### Step 2: Load Kernel Module
 
+```bash id="jv3w1q"
 sudo insmod monitor.ko
+```
 
 ---
 
 ### Step 3: Verify Control Device
 
+```bash id="9d0v8y"
 ls -l /dev/container_monitor
+```
 
 If not present:
 
-sudo mknod /dev/container_monitor c 239 0  
-sudo chmod 666 /dev/container_monitor  
+```bash id="0p7h2x"
+sudo mknod /dev/container_monitor c 239 0
+sudo chmod 666 /dev/container_monitor
+```
 
 ---
 
 ### Step 4: Start Supervisor
 
+```bash id="q3k8m1"
 sudo ./engine supervisor ./rootfs-base
+```
 
 The supervisor is a long-running process that manages containers, handles CLI requests, and coordinates logging.
 
@@ -55,8 +82,10 @@ The supervisor is a long-running process that manages containers, handles CLI re
 
 ### Step 5: Create Per-Container Root Filesystems
 
-cp -a ./rootfs-base ./rootfs-alpha  
-cp -a ./rootfs-base ./rootfs-beta  
+```bash id="s6l9z0"
+cp -a ./rootfs-base ./rootfs-alpha
+cp -a ./rootfs-base ./rootfs-beta
+```
 
 Each container uses its own writable root filesystem.
 
@@ -64,71 +93,91 @@ Each container uses its own writable root filesystem.
 
 ### Step 6: Open a New Terminal
 
-Run all CLI commands in a separate terminal while the supervisor is running.
+Run CLI commands in a separate terminal while the supervisor is running.
 
 ---
 
 ### Step 7: Start Containers
 
-sudo ./engine start alpha ./rootfs-alpha /bin/sh --soft-mib 48 --hard-mib 80  
-sudo ./engine start beta ./rootfs-beta /bin/sh --soft-mib 64 --hard-mib 96  
+```bash id="g2t5n7"
+sudo ./engine start alpha ./rootfs-alpha /bin/sh --soft-mib 48 --hard-mib 80
+sudo ./engine start beta ./rootfs-beta /bin/sh --soft-mib 64 --hard-mib 96
+```
 
 ---
 
 ### Step 8: List Containers
 
-sudo ./engine ps  
+```bash id="k8c2r1"
+sudo ./engine ps
+```
 
 ---
 
 ### Step 9: Inspect One Container
 
-sudo ./engine logs alpha  
+```bash id="z7y1m3"
+sudo ./engine logs alpha
+```
 
 ---
 
 ### Step 10: Run Workloads Inside Container
 
-Copy workload binaries:
-
-cp cpu_hog ./rootfs-alpha/  
-cp memory_hog ./rootfs-alpha/  
+```bash id="t5m0q8"
+cp cpu_hog ./rootfs-alpha/
+cp memory_hog ./rootfs-alpha/
+```
 
 Run memory test:
 
-sudo ./engine start memhog ./rootfs-alpha /memory_hog --soft-mib 32 --hard-mib 64  
+```bash id="f1b9e6"
+sudo ./engine start memhog ./rootfs-alpha /memory_hog --soft-mib 32 --hard-mib 64
+```
 
 ---
 
 ### Step 11: Run Scheduling Experiment
 
-./cpu_hog &  
-./io_pulse &  
+```bash id="w3r4p2"
+./cpu_hog &
+./io_pulse &
+```
 
 ---
 
 ### Step 12: Stop Containers
 
-sudo ./engine stop alpha  
-sudo ./engine stop beta  
+```bash id="c9d6l1"
+sudo ./engine stop alpha
+sudo ./engine stop beta
+```
 
 ---
 
 ### Step 13: Stop Supervisor
 
-Press Ctrl + C in the supervisor terminal.
+Press:
+
+```
+Ctrl + C
+```
 
 ---
 
 ### Step 14: Inspect Kernel Logs
 
-sudo dmesg | tail  
+```bash id="n2v8x5"
+sudo dmesg | tail
+```
 
 ---
 
 ### Step 15: Unload Kernel Module
 
-sudo rmmod monitor  
+```bash id="p0k7u3"
+sudo rmmod monitor
+```
 
 ---
 
@@ -140,7 +189,7 @@ sudo rmmod monitor
 
 ![img](./screenshots/Screenshot1.png)
 
-This screenshot shows two containers (alpha and beta) running simultaneously under a single supervisor process, demonstrating multi-container support and centralized management.
+This screenshot shows two containers (alpha and beta) successfully started and listed using the `engine ps` command, confirming that both are running simultaneously under a single supervisor process.
 
 ---
 
@@ -148,7 +197,7 @@ This screenshot shows two containers (alpha and beta) running simultaneously und
 
 ![img](./screenshots/Screenshot2.png)
 
-The `engine ps` output displays container metadata including PID, state, uptime, and memory limits, confirming proper tracking by the supervisor.
+The `engine ps` output displays container metadata including PID, state, uptime, and memory limits, confirming that the supervisor is correctly tracking all running containers.
 
 ---
 
@@ -156,7 +205,7 @@ The `engine ps` output displays container metadata including PID, state, uptime,
 
 ![img](./screenshots/Screenshot3.png)
 
-Continuous output from the container workload is captured and stored, demonstrating that the logging pipeline correctly handles producer-consumer synchronization.
+This screenshot shows logs retrieved using the `engine logs` command, demonstrating that container output is captured and stored through the bounded-buffer logging pipeline with proper synchronization.
 
 ---
 
@@ -164,7 +213,7 @@ Continuous output from the container workload is captured and stored, demonstrat
 
 ![img](./screenshots/Screenshot4.png)
 
-The CLI command and supervisor response demonstrate successful inter-process communication through the control channel.
+This screenshot demonstrates a CLI command (`engine start gamma`) interacting with the supervisor, confirming successful inter-process communication through the control channel.
 
 ---
 
@@ -172,7 +221,7 @@ The CLI command and supervisor response demonstrate successful inter-process com
 
 ![img](./screenshots/Screenshot5.png)
 
-Kernel logs show a soft-limit warning when memory usage exceeds the threshold, while the container continues execution.
+Kernel logs show a soft-limit warning when memory usage exceeds the configured threshold, while the container continues execution.
 
 ---
 
@@ -180,7 +229,7 @@ Kernel logs show a soft-limit warning when memory usage exceeds the threshold, w
 
 ![img](./screenshots/Screenshot6.png)
 
-The kernel terminates the container after exceeding the hard memory limit, and the supervisor updates the container state accordingly.
+The kernel terminates the container after exceeding the hard memory limit, and logs confirm that the container was killed and enforcement was applied.
 
 ---
 
@@ -188,7 +237,7 @@ The kernel terminates the container after exceeding the hard memory limit, and t
 
 ![img](./screenshots/Screenshot7.png)
 
-CPU-bound and I/O-bound workloads run concurrently, demonstrating how the scheduler distributes CPU time based on workload characteristics.
+CPU-bound (`cpu_hog`) and I/O-bound (`io_pulse`) workloads run concurrently, demonstrating how the scheduler distributes CPU time based on workload characteristics.
 
 ---
 
@@ -210,7 +259,7 @@ Linux namespaces (PID, UTS, and mount) are used to isolate containers. PID names
 
 ### Supervisor and Process Lifecycle
 
-The supervisor manages container creation, tracks metadata, and handles termination signals. It uses waitpid() to clean up child processes and prevent zombies.
+The supervisor manages container creation, tracks metadata, and handles termination signals. It uses `waitpid()` to clean up child processes and prevent zombie processes.
 
 ---
 
@@ -236,53 +285,33 @@ The Completely Fair Scheduler distributes CPU time fairly. CPU-bound tasks consu
 
 ### Namespace Isolation
 
-Choice:  
-PID, UTS, mount namespaces  
-
-Tradeoff:  
-No network isolation  
-
-Justification:  
-Focuses on core container isolation concepts  
+Choice: PID, UTS, mount namespaces
+Tradeoff: No network isolation
+Justification: Focuses on core container isolation concepts
 
 ---
 
 ### Supervisor Architecture
 
-Choice:  
-Single supervisor process  
-
-Tradeoff:  
-Single point of failure  
-
-Justification:  
-Simplifies management and coordination  
+Choice: Single supervisor process
+Tradeoff: Single point of failure
+Justification: Simplifies management and coordination
 
 ---
 
 ### IPC and Logging
 
-Choice:  
-Pipes with bounded buffer  
-
-Tradeoff:  
-Synchronization complexity  
-
-Justification:  
-Ensures reliable logging without data loss  
+Choice: Pipes with bounded buffer
+Tradeoff: Synchronization complexity
+Justification: Ensures reliable logging without data loss
 
 ---
 
 ### Kernel Monitor
 
-Choice:  
-Kernel module with periodic checks  
-
-Tradeoff:  
-Slight delay in enforcement  
-
-Justification:  
-Simpler and stable implementation  
+Choice: Kernel module with periodic checks
+Tradeoff: Slight delay in enforcement
+Justification: Simpler and stable implementation
 
 ---
 
@@ -290,10 +319,12 @@ Simpler and stable implementation
 
 ### Experiment: CPU-bound vs I/O-bound
 
-| Workload | Observed Behavior |
-|----------|------------------|
+| Workload | Observed Behavior                    |
+| -------- | ------------------------------------ |
 | cpu_hog  | Continuous execution (~1 update/sec) |
-| io_pulse | Periodic output due to I/O waits |
+| io_pulse | Periodic output due to I/O waits     |
+
+---
 
 ### Observation
 
@@ -304,3 +335,5 @@ CPU-bound processes utilize CPU continuously, while I/O-bound processes frequent
 ## Conclusion
 
 This project demonstrates container runtime implementation, process isolation, kernel monitoring, IPC mechanisms, and scheduling behavior in Linux.
+
+---
