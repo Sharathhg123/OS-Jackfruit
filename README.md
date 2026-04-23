@@ -1,22 +1,3 @@
-# OS-Jackfruit: Multi-Container Runtime with Kernel Monitoring
-
----
-
-## 1. Team Information
-
-| Name        | SRN           |
-|------------|--------------|
-| Sharath H G | PES1UG25CS844 |
-| Gowtham S   | PES1UG24CS173 |
-
----
-
-## 2. Build, Load, and Run Instructions
-
-The following steps reproduce the complete setup on a fresh Ubuntu 22.04/24.04 VM.
-# OS-Jackfruit: Multi-Container Runtime with Kernel Monitoring
-
----
 
 ## 1. Team Information
 
