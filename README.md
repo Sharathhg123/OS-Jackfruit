@@ -138,7 +138,7 @@ sudo rmmod monitor
 
 ### 1. Multi-container Supervision
 
-![img](./screenshots/screenshot1.png)
+![img](./screenshots/Screenshot1.png)
 
 This screenshot shows two containers (alpha and beta) running simultaneously under a single supervisor process, demonstrating multi-container support and centralized management.
 
@@ -146,7 +146,7 @@ This screenshot shows two containers (alpha and beta) running simultaneously und
 
 ### 2. Metadata Tracking
 
-![img](./screenshots/screenshot2.png)
+![img](./screenshots/Screenshot2.png)
 
 The `engine ps` output displays container metadata including PID, state, uptime, and memory limits, confirming proper tracking by the supervisor.
 
@@ -154,7 +154,7 @@ The `engine ps` output displays container metadata including PID, state, uptime,
 
 ### 3. Bounded-buffer Logging
 
-![img](./screenshots/screenshot3.png)
+![img](./screenshots/Screenshot3.png)
 
 Continuous output from the container workload is captured and stored, demonstrating that the logging pipeline correctly handles producer-consumer synchronization.
 
@@ -162,7 +162,7 @@ Continuous output from the container workload is captured and stored, demonstrat
 
 ### 4. CLI and IPC
 
-![img](./screenshots/screenshot4.png)
+![img](./screenshots/Screenshot4.png)
 
 The CLI command and supervisor response demonstrate successful inter-process communication through the control channel.
 
@@ -170,7 +170,7 @@ The CLI command and supervisor response demonstrate successful inter-process com
 
 ### 5. Soft-limit Warning
 
-![img](./screenshots/screenshot5.png)
+![img](./screenshots/Screenshot5.png)
 
 Kernel logs show a soft-limit warning when memory usage exceeds the threshold, while the container continues execution.
 
@@ -178,7 +178,7 @@ Kernel logs show a soft-limit warning when memory usage exceeds the threshold, w
 
 ### 6. Hard-limit Enforcement
 
-![img](./screenshots/screenshot6.png)
+![img](./screenshots/Screenshot6.png)
 
 The kernel terminates the container after exceeding the hard memory limit, and the supervisor updates the container state accordingly.
 
@@ -186,7 +186,7 @@ The kernel terminates the container after exceeding the hard memory limit, and t
 
 ### 7. Scheduling Experiment
 
-![img](./screenshots/screenshot7.png)
+![img](./screenshots/Screenshot7.png)
 
 CPU-bound and I/O-bound workloads run concurrently, demonstrating how the scheduler distributes CPU time based on workload characteristics.
 
@@ -194,7 +194,7 @@ CPU-bound and I/O-bound workloads run concurrently, demonstrating how the schedu
 
 ### 8. Clean Teardown
 
-![img](./screenshots/screenshot8.png)
+![img](./screenshots/Screenshot8.png)
 
 The absence of defunct processes confirms that all containers were properly terminated and no zombie processes remain.
 
